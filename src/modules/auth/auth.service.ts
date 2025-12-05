@@ -1,4 +1,6 @@
 import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
+import config from "../../config";
 import { pool } from "../../config/db";
 
 const signup = async (payload: Record<string, unknown>) => {
@@ -21,6 +23,38 @@ const signup = async (payload: Record<string, unknown>) => {
 	return result;
 };
 
+const signin = async (email: string, password: string) => {
+	const result = await pool.query(`SELECT * FROM users WHERE email=$1`, [email]);
+
+	if (result.rows.length === 0) {
+		throw new Error("User not found");
+	}
+
+	const user = result.rows[0];
+
+	const isMatch = bcrypt.compare(password, user.password);
+
+	if (!isMatch) {
+		throw new Error("Incorrect password!");
+	}
+
+	const payload = {
+		id: user.id,
+		name: user.name,
+		email: user.email,
+		role: user.role,
+	};
+
+	const token = jwt.sign(payload, config.jwt_secret!, {
+		expiresIn: "7d",
+	});
+
+	delete user.password;
+
+	return { token, user };
+};
+
 export const authServices = {
 	signup,
+	signin,
 };
