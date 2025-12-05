@@ -24,7 +24,7 @@ const signup = async (payload: Record<string, unknown>) => {
 };
 
 const signin = async (email: string, password: string) => {
-	const result = await pool.query(`SELECT * FROM users WHERE email=$1`, [email]);
+	const result = await pool.query(`SELECT * FROM users WHERE email=$1`, [email.toLowerCase()]);
 
 	if (result.rows.length === 0) {
 		throw new Error("User not found");

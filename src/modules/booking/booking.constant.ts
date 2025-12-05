@@ -1,4 +1,4 @@
-export const status = {
+export const Status = {
 	active: "active",
 	cancelled: "cancelled",
 	returned: "returned",

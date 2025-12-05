@@ -1,9 +1,11 @@
 import { Router } from "express";
+import auth from "../../middleware/auth";
+import { Roles } from "../auth/auth.constant";
 import { bookingControllers } from "./booking.controller";
 
 const router = Router();
 
-router.post("/", bookingControllers.createBooking);
-router.get("/", bookingControllers.getAllBooking);
+router.post("/", auth(Roles.admin, Roles.customer), bookingControllers.createBooking);
+router.get("/", auth(Roles.admin, Roles.customer), bookingControllers.getAllBooking);
 
 export const bookingRoutes = router;
