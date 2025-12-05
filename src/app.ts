@@ -1,6 +1,7 @@
 import express, { Request, Response } from "express";
 import initDB from "./config/db";
 import { authRoutes } from "./modules/auth/auth.route";
+import { bookingRoutes } from "./modules/booking/booking.route";
 import { userRoutes } from "./modules/user/user.route";
 import { vehicleRoutes } from "./modules/vehicle/vehicle.route";
 
@@ -22,7 +23,7 @@ app.use("/api/v1/vehicles", vehicleRoutes);
 app.use("/api/v1/users", userRoutes);
 
 // Booking Routes
-// app.use("/api/v1/bookings", bookingRoutes);
+app.use("/api/v1/bookings", bookingRoutes);
 
 app.get("/", (req: Request, res: Response) => {
 	res.status(200).json({
