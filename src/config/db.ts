@@ -8,7 +8,7 @@ const initDB = async () => {
         id SERIAL PRIMARY KEY,
         name VARCHAR(150) NOT NULL,
         email VARCHAR(200) UNIQUE NOT NUll,
-        password TEXT NOT NULL CHECK (LENGTH(password) >= 6),
+        password TEXT NOT NULL,
         phone VARCHAR(15) NOT NULL,
         role VARCHAR(20) DEFAULT 'customer'
         )`);

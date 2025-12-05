@@ -4,6 +4,10 @@ import { pool } from "../../config/db";
 const signup = async (payload: Record<string, unknown>) => {
 	const { name, email, password, phone, role } = payload;
 
+	if ((password as string).length < 6) {
+		throw new Error("Password character should be minimum 6");
+	}
+
 	const hashedPassword = await bcrypt.hash(password as string, 10);
 
 	const result = await pool.query(
