@@ -7,5 +7,6 @@ router.post("/", vehicleControllers.createVehicle);
 router.get("/", vehicleControllers.getAllVehicles);
 router.get("/:vehicleId", vehicleControllers.getSingleVehicle);
 router.delete("/:vehicleId", vehicleControllers.deleteVehicle);
+router.put("/:vehicleId", vehicleControllers.updateVehicle);
 
 export const vehicleRoutes = router;
