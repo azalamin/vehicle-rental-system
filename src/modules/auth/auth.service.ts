@@ -49,9 +49,11 @@ const signin = async (email: string, password: string) => {
 		expiresIn: "7d",
 	});
 
+	const accessToken = `Bearer ${token}`;
+
 	delete user.password;
 
-	return { token, user };
+	return { accessToken, user };
 };
 
 export const authServices = {
