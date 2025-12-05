@@ -14,7 +14,7 @@ const signup = async (payload: Record<string, unknown>) => {
 
 	const result = await pool.query(
 		`
-        INSERT INTO users(name, email, password, phone, role) VALUES($1, $2, $3, $4, $5) RETURNING *`,
+        INSERT INTO users(name, email, password, phone, role) VALUES($1, LOWER($2), $3, $4, $5) RETURNING *`,
 		[name, email, hashedPassword, phone, role]
 	);
 
