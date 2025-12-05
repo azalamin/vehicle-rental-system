@@ -19,11 +19,11 @@ const createBooking = async (req: Request, res: Response) => {
 
 const getAllBooking = async (req: Request, res: Response) => {
 	try {
-		const result = await bookingServices.getAllBooking();
+		const result = await bookingServices.getAllBooking(req);
 		res.status(200).json({
 			success: true,
 			message: "Bookings retrieved successfully",
-			data: result.rows,
+			data: result,
 		});
 	} catch (error) {
 		res.status(500).json({
