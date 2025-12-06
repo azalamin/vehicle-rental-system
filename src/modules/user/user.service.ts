@@ -1,4 +1,3 @@
-import { Request } from "express";
 import { pool } from "../../config/db";
 
 const getUsers = async () => {
@@ -9,8 +8,8 @@ const getUsers = async () => {
 	return result;
 };
 
-const updateUser = async (req: Request, userId: string) => {
-	const { name, email, phone, role } = req.body;
+const updateUser = async (payload: Record<string, unknown>, userId: string) => {
+	const { name, email, phone, role } = payload;
 	const result = await pool.query(
 		`UPDATE users SET name = $1, email = LOWER($2), phone = $3, role = $4 WHERE id = $5 RETURNING name, email, phone, role, id`,
 		[name, email, phone, role, userId]

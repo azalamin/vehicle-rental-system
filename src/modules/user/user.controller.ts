@@ -22,19 +22,20 @@ const getUsers = async (req: Request, res: Response) => {
 const updateUser = async (req: Request, res: Response) => {
 	try {
 		const currentUser = decodedUser(req);
-		if (currentUser.role === Roles.admin || currentUser.id === req.params.userId) {
-			const result = await userServices.updateUser(req, req.params.userId!);
+		const userId = Number(req.params.userId);
+		if (currentUser.role === Roles.admin || currentUser.id === userId) {
+			const result = await userServices.updateUser(req.body, req.params.userId!);
 			return res.status(200).json({
 				success: true,
 				message: "User updated successfully",
 				data: result.rows[0],
 			});
-		} else {
-			return res.status(401).json({
-				success: false,
-				message: "Unauthorized access!",
-			});
 		}
+
+		return res.status(401).json({
+			success: false,
+			message: "Unauthorized access!",
+		});
 	} catch (error) {
 		res.status(500).json({
 			success: false,
