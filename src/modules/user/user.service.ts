@@ -23,10 +23,13 @@ const updateUser = async (payload: Record<string, unknown>, userId: string) => {
 };
 
 const deleteUser = async (userId: string) => {
-	const result = await pool.query(`DELETE FROM users WHERE id=$1`, [userId]);
+	const result = await pool.query(
+		`DELETE FROM users WHERE id=$1 AND NOT EXISTS(SELECT 1 FROM bookings WHERE bookings.customer_id = users.id AND bookings.status = 'active')`,
+		[userId]
+	);
 
 	if (result.rowCount !== 1) {
-		throw new Error("No users found!");
+		throw new Error("User cannot be deleted or user not found!");
 	}
 
 	return result;
