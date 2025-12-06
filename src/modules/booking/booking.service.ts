@@ -9,7 +9,7 @@ const createBooking = async (payload: Record<string, unknown>) => {
 	const { customer_id, vehicle_id, rent_start_date, rent_end_date } = payload;
 
 	const vehicleResult = await pool.query(
-		`SELECT vehicle_name, daily_rent_price FROM vehicles WHERE id=$1`,
+		`SELECT vehicle_name, daily_rent_price, availability_status FROM vehicles WHERE id=$1`,
 		[vehicle_id]
 	);
 
@@ -18,6 +18,10 @@ const createBooking = async (payload: Record<string, unknown>) => {
 	}
 
 	const vehicle = vehicleResult.rows[0];
+
+	if (vehicle.availability_status !== "available") {
+		throw new Error("Vehicle is not available at this moment!");
+	}
 
 	const days = calculateDays(rent_start_date as string, rent_end_date as string);
 
@@ -32,6 +36,8 @@ const createBooking = async (payload: Record<string, unknown>) => {
 		`UPDATE vehicles SET availability_status='booked' WHERE id=$1 AND availability_status='available'`,
 		[vehicle_id]
 	);
+
+	delete vehicle.availability_status;
 
 	return { ...result.rows[0], vehicle };
 };

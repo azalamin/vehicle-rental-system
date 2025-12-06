@@ -43,10 +43,15 @@ const getAllBooking = async (req: Request, res: Response) => {
 const updateBooking = async (req: Request, res: Response) => {
 	try {
 		const result = await bookingServices.updateBooking(req, req.params.bookingId as string);
-		if (result?.rows.length === 0) {
-			res.status(409).json({
-				success: true,
-				message: "You cannot cancel the booking!",
+		if (result.rowCount === 0) {
+			return res.status(404).json({
+				success: false,
+				message: "Booking is not found!",
+			});
+		} else if (result.rows.length === 0) {
+			return res.status(409).json({
+				success: false,
+				message: "You cannot update booking!",
 			});
 		} else {
 			res.status(200).json({
