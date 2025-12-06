@@ -20,11 +20,41 @@ const createBooking = async (req: Request, res: Response) => {
 const getAllBooking = async (req: Request, res: Response) => {
 	try {
 		const result = await bookingServices.getAllBooking(req);
-		res.status(200).json({
-			success: true,
-			message: "Bookings retrieved successfully",
-			data: result,
+		if (result.length === 0) {
+			res.status(404).json({
+				success: true,
+				message: "No bookings found!!",
+				data: result,
+			});
+		} else {
+			res.status(200).json({
+				success: true,
+				message: "Bookings retrieved successfully",
+				data: result,
+			});
+		}
+	} catch (error) {
+		res.status(500).json({
+			success: false,
+			message: (error as Error).message,
 		});
+	}
+};
+const updateBooking = async (req: Request, res: Response) => {
+	try {
+		const result = await bookingServices.updateBooking(req, req.params.bookingId as string);
+		if (result?.rows.length === 0) {
+			res.status(409).json({
+				success: true,
+				message: "You cannot cancel the booking!",
+			});
+		} else {
+			res.status(200).json({
+				success: true,
+				message: "Booking updated successfully",
+				data: result?.rows,
+			});
+		}
 	} catch (error) {
 		res.status(500).json({
 			success: false,
@@ -36,4 +66,5 @@ const getAllBooking = async (req: Request, res: Response) => {
 export const bookingControllers = {
 	createBooking,
 	getAllBooking,
+	updateBooking,
 };

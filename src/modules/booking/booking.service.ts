@@ -1,8 +1,7 @@
 import { Request } from "express";
-import jwt, { JwtPayload } from "jsonwebtoken";
-import config from "../../config";
 import { pool } from "../../config/db";
 import calculateDays from "../../helpers/calculateDays";
+import decodedUser from "../../helpers/decodedUser";
 import { Roles } from "../auth/auth.constant";
 import { Status } from "./booking.constant";
 
@@ -29,14 +28,18 @@ const createBooking = async (payload: Record<string, unknown>) => {
 		[customer_id, vehicle_id, rent_start_date, rent_end_date, totalRentPrice, Status.active]
 	);
 
+	await pool.query(
+		`UPDATE vehicles SET availability_status='booked' WHERE id=$1 AND availability_status='available'`,
+		[vehicle_id]
+	);
+
 	return { ...result.rows[0], vehicle };
 };
 
 const getAllBooking = async (req: Request) => {
-	const accessToken = req.headers.authorization?.split(" ")[1];
-	const decode = jwt.verify(accessToken as string, config.jwt_secret as string) as JwtPayload;
+	const currentUser = decodedUser(req);
 
-	if (decode.role === Roles.admin) {
+	if (currentUser.role === Roles.admin) {
 		const result = await pool.query(`
 			SELECT
 			bookings.id,
@@ -93,7 +96,7 @@ const getAllBooking = async (req: Request) => {
 			WHERE bookings.customer_id=$1
 			ORDER BY bookings.id DESC
 	`,
-			[decode.id]
+			[currentUser.id]
 		);
 
 		// formatted the database data according to user & admin
@@ -115,7 +118,24 @@ const getAllBooking = async (req: Request) => {
 	}
 };
 
+const updateBooking = async (req: Request, bookingId: string) => {
+	const updatedStatus = req.body.status;
+	const currentUser = decodedUser(req);
+	if (currentUser.role === Roles.customer && updatedStatus === "cancelled") {
+		return await pool.query(
+			`UPDATE bookings SET status = $1 WHERE id = $2 AND customer_id = $3 AND rent_start_date::timestamp > NOW() AND status ='active' RETURNING *`,
+			[updatedStatus, bookingId, currentUser.id]
+		);
+	} else {
+		return await pool.query(
+			`UPDATE bookings SET status = 'cancelled' WHERE id = $1 AND customer_id = $2 AND rent_start_date::timestamp > NOW() AND status ='active' RETURNING *`,
+			[bookingId, currentUser.id]
+		);
+	}
+};
+
 export const bookingServices = {
 	createBooking,
 	getAllBooking,
+	updateBooking,
 };
