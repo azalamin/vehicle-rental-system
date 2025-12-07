@@ -2,8 +2,9 @@ import { Request } from "express";
 import { pool } from "../../config/db";
 import calculateDays from "../../helpers/calculateDays";
 import decodedUser from "../../helpers/decodedUser";
+import { isEnumValue } from "../../helpers/isEnumValue";
 import { Roles } from "../auth/auth.constant";
-import { Status } from "./booking.constant";
+import { StatusCode } from "./booking.constant";
 
 const createBooking = async (payload: Record<string, unknown>) => {
 	const { customer_id, vehicle_id, rent_start_date, rent_end_date } = payload;
@@ -29,7 +30,7 @@ const createBooking = async (payload: Record<string, unknown>) => {
 
 	const result = await pool.query(
 		`INSERT INTO bookings(customer_id, vehicle_id, rent_start_date, rent_end_date, total_price, status) VALUES($1, $2, $3, $4, $5, $6) RETURNING *`,
-		[customer_id, vehicle_id, rent_start_date, rent_end_date, totalRentPrice, Status.active]
+		[customer_id, vehicle_id, rent_start_date, rent_end_date, totalRentPrice, StatusCode.active]
 	);
 
 	await pool.query(
@@ -138,7 +139,7 @@ const getAllBooking = async (req: Request) => {
 const updateBooking = async (req: Request, bookingId: string) => {
 	const updatedStatus = req.body.status;
 
-	if (!updatedStatus || (updatedStatus !== Status.cancelled && updatedStatus !== Status.returned)) {
+	if (!isEnumValue(StatusCode, updatedStatus)) {
 		throw new Error("Invalid status code");
 	}
 

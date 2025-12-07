@@ -1,4 +1,4 @@
-export const Status = {
+export const StatusCode = {
 	active: "active",
 	cancelled: "cancelled",
 	returned: "returned",

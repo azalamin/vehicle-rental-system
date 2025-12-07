@@ -2,6 +2,7 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import config from "../../config";
 import { pool } from "../../config/db";
+import { isEnumValue } from "../../helpers/isEnumValue";
 import { Roles } from "./auth.constant";
 
 const signup = async (payload: Record<string, unknown>) => {
@@ -11,7 +12,7 @@ const signup = async (payload: Record<string, unknown>) => {
 		throw new Error("Password character should be minimum 6");
 	}
 
-	if (role !== Roles.admin && role !== Roles.customer) {
+	if (!isEnumValue(Roles, role)) {
 		throw new Error("Invalid role");
 	}
 

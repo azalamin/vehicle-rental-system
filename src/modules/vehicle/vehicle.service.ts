@@ -1,11 +1,16 @@
 import { pool } from "../../config/db";
-import { VehicleTypes } from "./vehicle.constant";
+import { isEnumValue } from "../../helpers/isEnumValue";
+import { AvailabilityStatus, VehicleTypes } from "./vehicle.constant";
 
 const createVehicle = async (payload: Record<string, unknown>) => {
 	const { vehicle_name, type, registration_number, daily_rent_price, availability_status } =
 		payload;
 
-	if (!Object.values(VehicleTypes).includes(type as any)) {
+	if (!isEnumValue(VehicleTypes, type)) {
+		throw new Error("Invalid vehicle type!");
+	}
+
+	if (!isEnumValue(AvailabilityStatus, availability_status)) {
 		throw new Error("Invalid vehicle type!");
 	}
 
