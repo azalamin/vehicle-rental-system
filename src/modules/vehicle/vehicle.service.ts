@@ -1,4 +1,5 @@
 import { pool } from "../../config/db";
+import dynamicUpdate from "../../helpers/dynamicUpdate";
 import { isEnumValue } from "../../helpers/isEnumValue";
 import { AvailabilityStatus, VehicleTypes } from "./vehicle.constant";
 
@@ -37,12 +38,35 @@ const deleteVehicle = async (id: string) => {
 };
 
 const updateVehicle = async (payload: Record<string, unknown>, id: string) => {
-	const { vehicle_name, type, registration_number, daily_rent_price, availability_status } =
-		payload;
-	return await pool.query(
-		`UPDATE vehicles SET vehicle_name=$1, type=$2, registration_number=$3, daily_rent_price=$4, availability_status=$5 WHERE id=$6 RETURNING *`,
-		[vehicle_name, type, registration_number, daily_rent_price, availability_status, id]
+	// const fields = [];
+	// const values: unknown[] = [];
+	// let index = 1;
+
+	// // Dynamically build update field
+	// for (const [key, value] of Object.entries(payload)) {
+	// 	if (value !== undefined) {
+	// 		fields.push(`${key} = $${index}`); // becomes like ["name" = $1,....]
+	// 		values.push(value); //becomes like [John Doe]
+	// 		index++;
+	// 	}
+	// }
+
+	// // return error if no input received from client
+	// if (fields.length === 0) {
+	// 	throw new Error("No data provided for update");
+	// }
+
+	// // add id to last value
+	// values.push(id);
+
+	const { fields, values, index } = dynamicUpdate(payload, id);
+
+	const result = await pool.query(
+		`UPDATE vehicles SET ${fields.join(", ")} WHERE id = $${index} RETURNING *`,
+		[...values]
 	);
+
+	return result;
 };
 
 export const vehicleServices = {
