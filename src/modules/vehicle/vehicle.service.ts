@@ -38,27 +38,6 @@ const deleteVehicle = async (id: string) => {
 };
 
 const updateVehicle = async (payload: Record<string, unknown>, id: string) => {
-	// const fields = [];
-	// const values: unknown[] = [];
-	// let index = 1;
-
-	// // Dynamically build update field
-	// for (const [key, value] of Object.entries(payload)) {
-	// 	if (value !== undefined) {
-	// 		fields.push(`${key} = $${index}`); // becomes like ["name" = $1,....]
-	// 		values.push(value); //becomes like [John Doe]
-	// 		index++;
-	// 	}
-	// }
-
-	// // return error if no input received from client
-	// if (fields.length === 0) {
-	// 	throw new Error("No data provided for update");
-	// }
-
-	// // add id to last value
-	// values.push(id);
-
 	const { fields, values, index } = dynamicUpdate(payload, id);
 
 	const result = await pool.query(
