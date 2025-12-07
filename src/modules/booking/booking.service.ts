@@ -127,7 +127,7 @@ const getAllBooking = async (req: Request) => {
 const updateBooking = async (req: Request, bookingId: string) => {
 	const updatedStatus = req.body.status;
 
-	if (!updatedStatus) {
+	if (!updatedStatus || (updatedStatus !== Status.cancelled && updatedStatus !== Status.returned)) {
 		throw new Error("Invalid status code");
 	}
 
