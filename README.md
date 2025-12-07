@@ -6,7 +6,7 @@ Built with Node.js, TypeScript, Express, and PostgreSQL (NeonDB) — following p
 ## 🌐 Live API URL
 
 ```js
-https://your-live-api-url.com
+https://vehicle-rental-system-ffpjthzms-azalamins-projects.vercel.app/
 ```
 
 ## 📌 Overview
@@ -124,7 +124,7 @@ src/
 ### 1️⃣ Clone the Repository
 
 ```bash
-git clone https://github.com/yourusername/vehicle-rental-system.git
+git https://github.com/azalamin/vehicle-rental-system.git
 cd vehicle-rental-system
 ```
 
@@ -139,9 +139,9 @@ npm install
 Create .env file:
 
 ```js
-PORT = 5000;
-CONNECTION_STR = your_neon_db_url;
-JWT_SECRET = your_jwt_secret;
+PORT=5001
+CONNECTION_STR=postgresql://neondb_owner:npg_Qf05AVeBXxCL@ep-wandering-term-a8ghmy6b-pooler.eastus2.azure.neon.tech/neondb?sslmode=require&channel_binding=require
+JWT_SECRET=KMUFsIDTnFmyG3nMiGM6H9FNFUROf3wh7SmqJp-QV30
 ```
 
 ### 4️⃣ Run Development Server
