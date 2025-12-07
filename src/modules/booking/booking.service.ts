@@ -45,6 +45,17 @@ const createBooking = async (payload: Record<string, unknown>) => {
 const getAllBooking = async (req: Request) => {
 	const currentUser = decodedUser(req);
 
+	await pool.query(
+		`WITH updated_bookings AS (
+		UPDATE bookings SET status = 'returned' WHERE status='active'
+		AND rent_end_date::timestamp < NOW()
+		RETURNING vehicle_id
+		)
+		UPDATE vehicles SET availability_status = 'available'
+		WHERE id IN (SELECT vehicle_id FROM updated_bookings)
+		`
+	);
+
 	if (currentUser.role === Roles.admin) {
 		const result = await pool.query(`
 			SELECT
