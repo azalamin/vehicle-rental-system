@@ -20,7 +20,15 @@ const createVehicle = async (req: Request, res: Response) => {
 const getAllVehicles = async (req: Request, res: Response) => {
 	try {
 		const result = await vehicleServices.getAllVehicles();
-		res.status(200).json({
+		if (result.rows.length === 0) {
+			return res.status(200).json({
+				success: true,
+				message: "No vehicles found",
+				data: result.rows,
+			});
+		}
+
+		return res.status(200).json({
 			success: true,
 			message: "Vehicles retrieved successfully",
 			data: result.rows,
@@ -36,10 +44,18 @@ const getAllVehicles = async (req: Request, res: Response) => {
 const getSingleVehicle = async (req: Request, res: Response) => {
 	try {
 		const result = await vehicleServices.getSingleVehicle(req.params.vehicleId as string);
-		res.status(200).json({
+		if (result.rows.length === 0) {
+			return res.status(200).json({
+				success: true,
+				message: "Vehicle not found",
+				data: result.rows,
+			});
+		}
+
+		return res.status(200).json({
 			success: true,
 			message: "Vehicle retrieved successfully",
-			data: result.rows,
+			data: result.rows[0],
 		});
 	} catch (error) {
 		res.status(500).json({
