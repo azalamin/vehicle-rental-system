@@ -2,12 +2,17 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import config from "../../config";
 import { pool } from "../../config/db";
+import { Roles } from "./auth.constant";
 
 const signup = async (payload: Record<string, unknown>) => {
 	const { name, email, password, phone, role } = payload;
 
 	if ((password as string).length < 6) {
 		throw new Error("Password character should be minimum 6");
+	}
+
+	if (role !== Roles.admin && role !== Roles.customer) {
+		throw new Error("Invalid role");
 	}
 
 	const hashedPassword = await bcrypt.hash(password as string, 10);

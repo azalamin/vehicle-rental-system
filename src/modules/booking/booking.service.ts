@@ -126,18 +126,62 @@ const getAllBooking = async (req: Request) => {
 
 const updateBooking = async (req: Request, bookingId: string) => {
 	const updatedStatus = req.body.status;
+
+	if (!updatedStatus) {
+		throw new Error("Invalid status code");
+	}
+
 	const currentUser = decodedUser(req);
+
+	// CUSTOMER CANCEL BOOKING
 	if (currentUser.role === Roles.customer && updatedStatus === "cancelled") {
-		return await pool.query(
-			`UPDATE bookings SET status = $1 WHERE id = $2 AND customer_id = $3 AND rent_start_date::timestamp > NOW() AND status ='active' RETURNING *`,
+		const result = await pool.query(
+			`
+			UPDATE bookings
+			SET status = $1
+			WHERE id = $2
+			  AND customer_id = $3
+			  AND status = 'active'
+			  AND rent_start_date::timestamp > NOW()
+			RETURNING *;
+			`,
 			[updatedStatus, bookingId, currentUser.id]
 		);
-	} else {
-		return await pool.query(
-			`UPDATE bookings SET status = 'cancelled' WHERE id = $1 AND customer_id = $2 AND rent_start_date::timestamp > NOW() AND status ='active' RETURNING *`,
-			[bookingId, currentUser.id]
-		);
+
+		if (result.rowCount === 0) {
+			throw new Error("You cannot cancel this booking");
+		}
+
+		return result;
 	}
+
+	// ADMIN RETURN BOOKING
+	if (currentUser.role === Roles.admin && updatedStatus === "returned") {
+		const result = await pool.query(
+			`
+			UPDATE bookings
+			SET status = $1
+			WHERE id = $2
+			  AND status = 'cancelled'
+			RETURNING *;
+			`,
+			[updatedStatus, bookingId]
+		);
+
+		if (result.rowCount === 0) {
+			throw new Error("Booking not found or not active");
+		}
+
+		// Admin can now restore vehicle to available
+		await pool.query(
+			`UPDATE vehicles SET availability_status='available' WHERE id=$1 AND availability_status='booked'`,
+			[result.rows[0].vehicle_id]
+		);
+
+		return result;
+	}
+
+	throw new Error("Invalid booking update request");
 };
 
 export const bookingServices = {
