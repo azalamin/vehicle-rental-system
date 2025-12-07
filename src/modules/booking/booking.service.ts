@@ -185,12 +185,16 @@ const updateBooking = async (req: Request, bookingId: string) => {
 		}
 
 		// Admin can now restore vehicle to available
-		await pool.query(
-			`UPDATE vehicles SET availability_status='available' WHERE id=$1 AND availability_status='booked'`,
+		const vehicleResult = await pool.query(
+			`UPDATE vehicles SET availability_status='available' WHERE id=$1 AND availability_status='booked' RETURNING availability_status`,
 			[result.rows[0].vehicle_id]
 		);
 
-		return result;
+		if (vehicleResult.rowCount === 0) {
+			throw new Error("Booking not found or not active");
+		}
+
+		return { ...result.rows[0], vehicle: vehicleResult.rows[0] };
 	}
 
 	throw new Error("Invalid booking update request");

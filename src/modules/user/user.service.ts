@@ -10,8 +10,9 @@ const getUsers = async () => {
 
 const updateUser = async (payload: Record<string, unknown>, userId: string) => {
 	const { name, email, phone, role } = payload;
+
 	const result = await pool.query(
-		`UPDATE users SET name = $1, email = LOWER($2), phone = $3, role = $4 WHERE id = $5 RETURNING name, email, phone, role, id`,
+		`UPDATE users SET name = $1, email = LOWER($2), phone = $3, role = $4 WHERE id = $5 RETURNING id, name, email, phone, role`,
 		[name, email, phone, role, userId]
 	);
 

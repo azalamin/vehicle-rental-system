@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+import { StatusCode } from "./booking.constant";
 import { bookingServices } from "./booking.service";
 
 const createBooking = async (req: Request, res: Response) => {
@@ -43,23 +44,20 @@ const getAllBooking = async (req: Request, res: Response) => {
 const updateBooking = async (req: Request, res: Response) => {
 	try {
 		const result = await bookingServices.updateBooking(req, req.params.bookingId as string);
-		if (result.rowCount === 0) {
-			return res.status(404).json({
-				success: false,
-				message: "Booking is not found!",
-			});
-		} else if (result.rows.length === 0) {
-			return res.status(409).json({
-				success: false,
-				message: "You cannot update booking!",
-			});
-		} else {
-			res.status(200).json({
+
+		if (result.status === StatusCode.returned) {
+			return res.status(200).json({
 				success: true,
-				message: "Booking updated successfully",
-				data: result?.rows,
+				message: "Booking marked as returned. Vehicle is now available",
+				data: result,
 			});
 		}
+
+		return res.status(200).json({
+			success: true,
+			message: "Booking cancelled successfully",
+			data: result?.rows,
+		});
 	} catch (error) {
 		res.status(500).json({
 			success: false,
