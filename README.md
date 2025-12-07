@@ -6,7 +6,7 @@ Built with Node.js, TypeScript, Express, and PostgreSQL (NeonDB) — following p
 ## 🌐 Live API URL
 
 ```js
-https://vehicle-rental-system-ffpjthzms-azalamins-projects.vercel.app/
+https://vehicle-rental-system-peach.vercel.app/
 ```
 
 ## 📌 Overview
